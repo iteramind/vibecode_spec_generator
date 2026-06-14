@@ -8,8 +8,8 @@ vi.mock("ai", () => ({
   })),
 }));
 
-vi.mock("@ai-sdk/openai", () => ({
-  openai: vi.fn(() => "mocked-openai-model"),
+vi.mock("@ai-sdk/anthropic", () => ({
+  anthropic: vi.fn(() => "mocked-anthropic-model"),
 }));
 
 describe("Generate Doc API Route", () => {
@@ -227,10 +227,10 @@ describe("Generate Doc API Route", () => {
 
   describe("Model Selection", () => {
     it("should use model from environment variable", async () => {
-      const { openai } = await import("@ai-sdk/openai");
-      const originalEnv = process.env.OPENAI_MODEL;
+      const { anthropic } = await import("@ai-sdk/anthropic");
+      const originalEnv = process.env.ANTHROPIC_MODEL;
 
-      process.env.OPENAI_MODEL = "gpt-4-turbo";
+      process.env.ANTHROPIC_MODEL = "claude-test-model";
 
       const req = new Request("http://localhost/api/generate-doc", {
         method: "POST",
@@ -242,20 +242,20 @@ describe("Generate Doc API Route", () => {
 
       await POST(req);
 
-      expect(openai).toHaveBeenCalledWith("gpt-4-turbo");
+      expect(anthropic).toHaveBeenCalledWith("claude-test-model");
 
       if (originalEnv) {
-        process.env.OPENAI_MODEL = originalEnv;
+        process.env.ANTHROPIC_MODEL = originalEnv;
       } else {
-        delete process.env.OPENAI_MODEL;
+        delete process.env.ANTHROPIC_MODEL;
       }
     });
 
-    it("should default to gpt-4o when no environment variable set", async () => {
-      const { openai } = await import("@ai-sdk/openai");
-      const originalEnv = process.env.OPENAI_MODEL;
+    it("should default to claude-opus-4-8 when no environment variable set", async () => {
+      const { anthropic } = await import("@ai-sdk/anthropic");
+      const originalEnv = process.env.ANTHROPIC_MODEL;
 
-      delete process.env.OPENAI_MODEL;
+      delete process.env.ANTHROPIC_MODEL;
 
       const req = new Request("http://localhost/api/generate-doc", {
         method: "POST",
@@ -267,10 +267,10 @@ describe("Generate Doc API Route", () => {
 
       await POST(req);
 
-      expect(openai).toHaveBeenCalledWith("gpt-4o");
+      expect(anthropic).toHaveBeenCalledWith("claude-opus-4-8");
 
       if (originalEnv) {
-        process.env.OPENAI_MODEL = originalEnv;
+        process.env.ANTHROPIC_MODEL = originalEnv;
       }
     });
   });
@@ -409,7 +409,7 @@ describe("Generate Doc API Route", () => {
   describe("Integration with AI SDK", () => {
     it("should call streamText with correct parameters", async () => {
       const { streamText } = await import("ai");
-      const { openai } = await import("@ai-sdk/openai");
+      const { anthropic } = await import("@ai-sdk/anthropic");
 
       const req = new Request("http://localhost/api/generate-doc", {
         method: "POST",
@@ -422,11 +422,11 @@ describe("Generate Doc API Route", () => {
       await POST(req);
 
       expect(streamText).toHaveBeenCalledWith({
-        model: "mocked-openai-model",
+        model: "mocked-anthropic-model",
         prompt: expect.any(String),
       });
 
-      expect(openai).toHaveBeenCalled();
+      expect(anthropic).toHaveBeenCalled();
     });
   });
 });

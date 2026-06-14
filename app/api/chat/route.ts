@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { streamText, generateText } from "ai";
 import { spikelog } from "@/app/utils/spikelog";
 
@@ -39,12 +39,12 @@ export async function POST(req: Request) {
     });
     console.log("\n" + "=".repeat(80) + "\n");
 
-    const modelName = process.env.OPENAI_MODEL || "gpt-4o";
+    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
     console.log(`🔧 Using model: ${modelName}\n`);
 
     if (stream) {
       const result = streamText({
-        model: openai(modelName),
+        model: anthropic(modelName),
         system: fullSystemPrompt,
         messages,
       });
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     }
 
     const result = await generateText({
-      model: openai(modelName),
+      model: anthropic(modelName),
       system: fullSystemPrompt,
       messages,
     });

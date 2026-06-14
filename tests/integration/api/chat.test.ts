@@ -11,8 +11,8 @@ vi.mock("ai", () => ({
   })),
 }));
 
-vi.mock("@ai-sdk/openai", () => ({
-  openai: vi.fn(() => "mocked-openai-model"),
+vi.mock("@ai-sdk/anthropic", () => ({
+  anthropic: vi.fn(() => "mocked-anthropic-model"),
 }));
 
 describe("Chat API Route", () => {
@@ -160,11 +160,11 @@ describe("Chat API Route", () => {
 
   describe("Model Selection", () => {
     it("should use model from environment variable", async () => {
-      const { openai } = await import("@ai-sdk/openai");
-      const originalEnv = process.env.OPENAI_MODEL;
+      const { anthropic } = await import("@ai-sdk/anthropic");
+      const originalEnv = process.env.ANTHROPIC_MODEL;
 
       // Mock environment variable
-      process.env.OPENAI_MODEL = "gpt-4-turbo";
+      process.env.ANTHROPIC_MODEL = "claude-test-model";
 
       const req = new Request("http://localhost/api/chat", {
         method: "POST",
@@ -175,22 +175,22 @@ describe("Chat API Route", () => {
 
       await POST(req);
 
-      expect(openai).toHaveBeenCalledWith("gpt-4-turbo");
+      expect(anthropic).toHaveBeenCalledWith("claude-test-model");
 
       // Restore original env
       if (originalEnv) {
-        process.env.OPENAI_MODEL = originalEnv;
+        process.env.ANTHROPIC_MODEL = originalEnv;
       } else {
-        delete process.env.OPENAI_MODEL;
+        delete process.env.ANTHROPIC_MODEL;
       }
     });
 
-    it("should default to gpt-4o when no environment variable set", async () => {
-      const { openai } = await import("@ai-sdk/openai");
-      const originalEnv = process.env.OPENAI_MODEL;
+    it("should default to claude-opus-4-8 when no environment variable set", async () => {
+      const { anthropic } = await import("@ai-sdk/anthropic");
+      const originalEnv = process.env.ANTHROPIC_MODEL;
 
       // Ensure env var is not set
-      delete process.env.OPENAI_MODEL;
+      delete process.env.ANTHROPIC_MODEL;
 
       const req = new Request("http://localhost/api/chat", {
         method: "POST",
@@ -201,11 +201,11 @@ describe("Chat API Route", () => {
 
       await POST(req);
 
-      expect(openai).toHaveBeenCalledWith("gpt-4o");
+      expect(anthropic).toHaveBeenCalledWith("claude-opus-4-8");
 
       // Restore original env
       if (originalEnv) {
-        process.env.OPENAI_MODEL = originalEnv;
+        process.env.ANTHROPIC_MODEL = originalEnv;
       }
     });
   });
