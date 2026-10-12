@@ -37,6 +37,18 @@ describe("useQuestionOptions helpers", () => {
     expect(result).toBe("Any constraints we should consider?");
   });
 
+  it("extractQuestionFromMessage should detect questions wrapped in markdown emphasis", () => {
+    // Arrange
+    const content =
+      "Let's start.\n\n**What kind of workouts do you want to track?**\n\n**Recommendation:** Strength training.";
+
+    // Act
+    const result = extractQuestionFromMessage(content);
+
+    // Assert
+    expect(result).toBe("What kind of workouts do you want to track?");
+  });
+
   it("extractQuestionFromMessage should return null when no question exists", () => {
     // Arrange
     const content = "This message has no question.";

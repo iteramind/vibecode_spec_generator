@@ -7,7 +7,8 @@ import { questionOptionsSchema, type QuestionOptions } from "@/app/schemas/quest
 export function extractQuestionFromMessage(content: string): string | null {
   const lines = content
     .split("\n")
-    .map((line) => line.trim())
+    // Strip markdown emphasis wrappers (e.g. "**Question?**") so bolded questions are detected
+    .map((line) => line.trim().replace(/^[*_]+|[*_]+$/g, "").trim())
     .filter(Boolean);
 
   const questionLines = lines.filter((line) => line.endsWith("?"));
