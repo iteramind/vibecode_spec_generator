@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { streamObject } from "ai";
 
 import { questionOptionsSchema } from "@/app/schemas/questionOptions";
@@ -28,8 +28,7 @@ export async function POST(req: Request) {
       return new Response("questionText is required", { status: 400 });
     }
 
-    const modelName =
-      process.env.OPENAI_OPTIONS_MODEL || process.env.OPENAI_MODEL || "gpt-4o";
+    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
 
     const prompt = [
       "CONVERSATION SUMMARY:",
@@ -42,7 +41,7 @@ export async function POST(req: Request) {
     ].join("\n");
 
     const result = streamObject({
-      model: openai(modelName),
+      model: anthropic(modelName),
       system: systemPrompt,
       prompt,
       schema: questionOptionsSchema,

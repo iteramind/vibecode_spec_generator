@@ -90,7 +90,7 @@ Tests the `/api/generate-doc` route:
 ## Mocking Strategy
 
 ### AI SDK Mocking
-The OpenAI SDK is mocked in integration tests to avoid actual API calls:
+The Anthropic SDK is mocked in integration tests to avoid actual API calls:
 
 ```typescript
 vi.mock("ai", () => ({
@@ -102,8 +102,8 @@ vi.mock("ai", () => ({
   })),
 }));
 
-vi.mock("@ai-sdk/openai", () => ({
-  openai: vi.fn(() => "mocked-openai-model"),
+vi.mock("@ai-sdk/anthropic", () => ({
+  anthropic: vi.fn(() => "mocked-anthropic-model"),
 }));
 ```
 
