@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     });
     console.log("\n" + "=".repeat(80) + "\n");
 
-    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
+    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-5-5";
     console.log(`🔧 Using model: ${modelName}\n`);
 
     if (stream) {

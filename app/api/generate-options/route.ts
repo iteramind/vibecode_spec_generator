@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       return new Response("questionText is required", { status: 400 });
     }
 
-    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
+    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-5-5";
 
     const prompt = [
       "CONVERSATION SUMMARY:",
