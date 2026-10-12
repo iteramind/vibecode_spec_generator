@@ -1,24 +1,25 @@
 # Vibe Scaffold
 
-[![Vercel Deployment](https://img.shields.io/github/deployments/benjaminshoemaker/vibecode_spec_generator/Production?label=Vercel&logo=vercel&logoColor=white)](https://vibescaffold.dev/)
-[![GitHub Repo stars](https://img.shields.io/github/stars/benjaminshoemaker/vibecode_spec_generator?label=Stars&logo=github)](https://github.com/benjaminshoemaker/vibecode_spec_generator)
+[![GitHub Repo stars](https://img.shields.io/github/stars/iteramind/vibecode_spec_generator?label=Stars&logo=github)](https://github.com/iteramind/vibecode_spec_generator)
 
-Live at **[vibescaffold.dev](https://vibescaffold.dev/)**.
+A Next.js app with a 4-step wizard. In each step you chat with Claude about your project, then generate a technical specification document from that conversation.
 
-A Next.js application with a multi-step wizard interface that uses AI-powered chat to gather requirements and generate comprehensive technical specification documents.
+AI coding tools tend to give "close but not quite right" results when the idea in your head never made it onto paper. Vibe Scaffold walks you through writing it down: it refines the idea into a one-pager, turns that into a technical architecture, then produces a staged development plan and an `AGENTS.md` that a coding agent can follow.
 
-Stop getting "close but not quite right" results from AI coding tools. Vibe Scaffold gives you a structured, step-by-step process to capture your vision and generate documentation that AI agents understand and can execute on iteratively. The app helps you refine your idea, turn it into full technical architecture, and create a step-by-step development plan. 
+> This repository is the [iteramind](https://github.com/iteramind) fork of [benjaminshoemaker/vibecode_spec_generator](https://github.com/benjaminshoemaker/vibecode_spec_generator). The upstream project runs at [vibescaffold.dev](https://vibescaffold.dev/).
 
 ## Quick Start
 
 ```bash
+git clone https://github.com/iteramind/vibecode_spec_generator.git
+cd vibecode_spec_generator
 npm install
 cp .env.example .env.local
-# add OPENAI_API_KEY=sk-... (and optionally NEXT_PUBLIC_GA_ID for analytics)
+# edit .env.local and set ANTHROPIC_API_KEY
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) and click **Start Building Now** to launch the wizard.
+Open [http://localhost:3000](http://localhost:3000) and click **Generate Your First Spec** (or **Get Started**) to open the wizard.
 
 ## Screenshots
 
@@ -27,452 +28,265 @@ Then open [http://localhost:3000](http://localhost:3000) and click **Start Build
 
 ## Features
 
-- **4-Step Sequential Workflow**: Each step builds on the previous with context awareness
-  - **Step 1 - One Pager**: Product vision, target audience, MVP requirements
-  - **Step 2 - Dev Spec**: Technical architecture, API design, data models, implementation details
-  - **Step 3 - Prompt Plan**: Staged development plan with LLM-ready prompts and checklists
-  - **Step 4 - AGENTS.md**: Automated agent guidance and workflow documentation
-
-- **AI-Powered Chat**: Interactive conversations with OpenAI models via the "Vibe Scaffold Assistant"
-- **Context-Aware Generation**: Later steps receive previous documents as context for coherent output
-- **State Persistence**: Progress automatically saved to localStorage
-- **Document Management**:
-  - Individual document downloads (ALL_CAPS_UNDERSCORES.md format)
-  - Download all documents as ZIP file
-  - Sample document preview on each step
-- **Completion Flow**: Final instructions modal with agent handoff guide and copyable command
-- **Real-time Streaming**: Chat and document generation stream in real-time for responsive UX
-- **Markdown Preview**: Toggle between rendered and raw markdown views
-- **Step Locking**: Must complete and approve each step before proceeding to the next
-- **Example Output**: Preview sample documents for each step to understand expected format
+- **4-step sequential workflow.** Each step receives the earlier steps' documents as context.
+  - **Step 1, One Pager:** product vision, target audience, MVP requirements
+  - **Step 2, Dev Spec:** technical architecture, API design, data models, implementation details
+  - **Step 3, Prompt Plan:** a staged development plan with LLM-ready prompts and checklists
+  - **Step 4, AGENTS.md:** guidance and workflow documentation for coding agents
+- **AI chat with Claude.** Replies stream in as they're generated.
+- **Answer suggestions.** The assistant can propose 3–6 multiple-choice answers to its own questions (`/api/generate-options`).
+- **Saved progress.** The wizard state lives in your browser's localStorage, so a refresh doesn't lose anything.
+- **Downloads.** Download a single document (`ONE_PAGER.md` and so on) or all of them as a ZIP.
+- **Markdown preview.** Switch between rendered and raw views.
+- **Step locking.** You approve each step before the next one unlocks.
+- **Example documents.** Each step can show a sample of the expected output.
 
 ## Tech Stack
 
-- **Next.js 14+** with App Router and Edge Runtime
-- **TypeScript** for type safety
-- **Tailwind CSS v3.4** for styling
-- **Vercel AI SDK** (`ai` package) for AI integration
-- **OpenAI API** (configurable via `OPENAI_MODEL`, defaults to `gpt-4o`) for chat and document generation
-- **Zustand** for state management with localStorage persistence
-- **React Markdown** for document rendering
-- **JSZip** for multi-document downloads
+| Area | Choice |
+|---|---|
+| Framework | Next.js 16 (App Router); API routes on the Edge Runtime |
+| UI | React 19, TypeScript 5, Tailwind CSS 3.4 |
+| AI | Vercel AI SDK (`ai` v5) with `@ai-sdk/anthropic` |
+| Model | Claude Opus 5.5 (`claude-opus-5-5`), changeable with `ANTHROPIC_MODEL` |
+| State | Zustand, persisted to localStorage |
+| Optional services | Postgres (`@vercel/postgres`), Resend, Google Analytics, Spikelog |
+| Tests | Vitest 4 with Testing Library and happy-dom |
 
 ## Prerequisites
 
-- Node.js 18+ installed
-- An OpenAI API key (get one at https://platform.openai.com/api-keys)
+- **Node.js 20.9 or newer.** Next.js 16 requires it; Node 22 is tested.
+- **An Anthropic API key.** Create one in the [Claude Console](https://console.anthropic.com/).
 
-## Setup Instructions
+## Configuration
 
-### 1. Install Dependencies
+Copy `.env.example` to `.env.local` and fill it in. Only the API key is required.
+
+| Variable | Required | What it does |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | **Yes** | Authenticates every Claude call. Without it, chat, document generation and answer suggestions all fail. |
+| `ANTHROPIC_MODEL` | No | Model for all three AI routes. Defaults to `claude-opus-5-5`. |
+| `POSTGRES_URL` | No | Database for analytics, chat logs and email sign-ups (see [Database](#database-optional)). Read by `@vercel/postgres`. |
+| `RESEND_API_KEY` | No | Sends an email each time someone generates a spec (see the caution under [Database](#database-optional)). |
+| `NEXT_PUBLIC_GA_ID` | No | Google Analytics 4 measurement ID (`G-XXXXXXXXXX`). The tracking script loads only when it's set. |
+| `SPIKELOG_API_KEY` | No | Sends API response-time and usage metrics to Spikelog. |
+
+Restart `npm run dev` after changing any of these.
+
+### Choosing a model
+
+Prices are Anthropic's API rates per million input/output tokens, as of October 2026.
+
+| Model | `ANTHROPIC_MODEL` | Input / output | Notes |
+|---|---|---|---|
+| Claude Opus 5.5 | `claude-opus-5-5` | $4 / $20 | Default. Anthropic's recommended general model. |
+| Claude Sonnet 5.5 | `claude-sonnet-5-5` | $2 / $10 | Faster and cheaper; a little less thorough on the long documents. |
+| Claude Haiku 5.5 | `claude-haiku-5-5` | $0.10 / $0.50 | Cheapest; built for short, high-volume tasks rather than long specs. |
+
+Check [Anthropic's pricing page](https://platform.claude.com/docs/en/about-claude/pricing) for current rates.
+
+Opus 5.5 and Sonnet 5.5 reject forced tool calls, which older versions of `@ai-sdk/anthropic` used to produce JSON. Keep `@ai-sdk/anthropic` at **2.0.109 or newer**, or `/api/generate-options` returns an empty response.
+
+## Deployment
+
+The app deploys as a standard Next.js project. Vercel is the simplest host, because the API routes run on the Edge Runtime and the database client is `@vercel/postgres`.
+
+### Deploy to Vercel (dashboard)
+
+1. Push your branch to GitHub.
+2. In [Vercel](https://vercel.com/new), click **Add New → Project** and import `iteramind/vibecode_spec_generator`. Vercel detects Next.js; keep the default build settings.
+3. Under **Environment Variables**, add `ANTHROPIC_API_KEY`. Add any optional variables from [Configuration](#configuration) you want.
+4. Click **Deploy**.
+5. To use your own domain, add it under **Project → Settings → Domains**.
+
+After this, every push to `main` deploys to production, and every other branch or pull request gets its own preview URL.
+
+### Deploy to Vercel (CLI)
 
 ```bash
-npm install
+npm i -g vercel
+vercel link                                   # connect this folder to a Vercel project
+vercel env add ANTHROPIC_API_KEY production   # paste the key when prompted
+vercel                                        # preview deployment
+vercel --prod                                 # production deployment
 ```
 
-### 2. Configure Environment Variables
+Add the same variables to the `preview` environment if you want preview deployments to work too.
 
-Create a `.env.local` file in the root directory (or edit the existing one):
+### Database (optional)
 
-```bash
-# Required
-OPENAI_API_KEY=your_openai_api_key_here
+The core wizard doesn't need a database. Without one, the build and deploy still succeed, and the chat, generation and download features all work. Only the optional logging routes (`/api/track-event`, `/api/log-chat`, `/api/log-metadata`, `/api/subscribe`) fail, and they log the error without affecting the wizard.
 
-# Optional: override default model (gpt-4o)
-OPENAI_MODEL=gpt-4o
+To turn them on:
 
-# Optional: Google Analytics (for production)
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-```
+1. **Create a Postgres database.** On Vercel, add **Neon** from **Storage** (or the Marketplace) and connect it to the project. That sets `POSTGRES_URL` for you. For local development, run `vercel env pull .env.local` to copy it down.
+2. **Create the base tables.** `subscribers` and `spec_metadata` aren't created by any file in `migrations/`. This SQL matches the columns the code writes:
 
-Replace `your_openai_api_key_here` with your actual OpenAI API key.
+   ```sql
+   CREATE TABLE IF NOT EXISTS subscribers (
+     id SERIAL PRIMARY KEY,
+     email TEXT UNIQUE NOT NULL,
+     created_at TIMESTAMP DEFAULT NOW()
+   );
 
-**Google Analytics Setup (Optional):**
-1. Create a GA4 property at https://analytics.google.com/
-2. Get your measurement ID (format: `G-XXXXXXXXXX`)
-3. Add it to your `.env.local` file as `NEXT_PUBLIC_GA_ID`
-4. For production deployments (Vercel, etc.), add this as an environment variable
+   CREATE TABLE IF NOT EXISTS spec_metadata (
+     id SERIAL PRIMARY KEY,
+     app_name TEXT,
+     problem TEXT,
+     ideal_user TEXT,
+     platform TEXT,
+     tech_stack TEXT[],
+     integration_count INTEGER,
+     complexity_tier TEXT,
+     created_at TIMESTAMP DEFAULT NOW()
+   );
+   ```
 
-### 3. Run the Development Server
+3. **Run the migrations in order**, with `POSTGRES_URL` set in your shell:
 
-```bash
-npm run dev
-```
+   ```bash
+   node scripts/run-migration.mjs migrations/001_user_events.sql
+   node scripts/run-migration.mjs migrations/002_add_client_id_to_subscribers.sql
+   node scripts/run-migration.mjs migrations/003_add_client_id_to_spec_metadata.sql
+   node scripts/run-migration.mjs migrations/004_chat_logs.sql
+   ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000)
+> **Caution: spec notification emails go to the upstream author.** `app/api/log-metadata/route.ts` sends its notification to a hard-coded address belonging to the original project's author. Change the `to:` address, and the `from:` address if you have a verified Resend domain, **before** you set `RESEND_API_KEY`.
+
+`npm run build` first runs `scripts/cleanup-test-data.mjs`. It deletes rows for the client IDs listed in `excluded-client-ids.txt`. Without a database it prints an error for each table and the build carries on.
+
+### Other hosts
+
+Any host that runs Next.js 16 works, for example Netlify, Railway, Render or a Node server running `npm run build && npm start`. Set the same environment variables. The database code uses `@vercel/postgres`, which works with any Postgres that accepts a `POSTGRES_URL` connection string, such as Neon.
+
+### After deploying
+
+- [ ] The landing page loads at the production URL.
+- [ ] One full wizard step works: chat, answer suggestions, generate, approve.
+- [ ] **Set a spending limit** for the API key's workspace in the [Claude Console](https://console.anthropic.com/) under **Limits**. The app has no rate limiting, so anyone who reaches it spends from your key.
+- [ ] If `NEXT_PUBLIC_GA_ID` is set, your visit appears in Google Analytics **Realtime**.
 
 ## Usage
 
-### Complete Workflow
+### Workflow
 
-Each step follows the same three-phase pattern:
+Each step has three phases:
 
-1. **Chat Phase**: Have an interactive conversation with the Vibe Scaffold Assistant
-   - The assistant asks targeted questions to gather requirements
-   - You provide details about your project
-   - Chat history is automatically saved
+1. **Chat.** The assistant asks targeted questions about your project. Answer them in your own words or pick a suggested option.
+2. **Generate.** Click the generate button under **ACTIONS** in the sidebar, for example **GENERATE ONE-PAGER**. Claude writes a markdown document from your conversation and the earlier steps' documents. You can regenerate as often as you like.
+3. **Approve.** Review the document in rendered or raw view, then click **APPROVE & NEXT** (**FINALIZE** on the last step) to lock it in and unlock the next step.
 
-2. **Generation Phase**: Generate a structured document
-   - Click the "Generate [Document]" button in the sidebar
-   - The AI synthesizes your chat conversation into a comprehensive markdown document
-   - Later steps include previous documents as context for coherence
-   - You can regenerate as many times as needed
+When all 4 steps are done, a final-instructions modal offers a ZIP of all documents and a ready-to-paste command for your AI coding agent.
 
-3. **Approval Phase**: Review and approve the document
-   - Toggle between rendered markdown and raw text views
-   - Click "Save Draft & Next Step" to lock in the document and proceed
-   - Download individual documents or all documents as a ZIP
+### Sample documents (development only)
 
-### Quick Start with Sample Documents (Development Mode)
-
-In development mode, click **"LOAD_SAMPLES"** in the header to instantly populate all 4 steps with example documents for a Photo Captioner app. This is useful for:
-- Testing the application without going through full chat flows
-- Understanding the expected output format
-- Quickly accessing Step 4 to test final features
-
-**Note**: Sample loading buttons are only visible in development mode (`NODE_ENV=development`).
+In development (`npm run dev`), a **LOAD_SAMPLES** button in the header fills all 4 steps with example documents for a Photo Captioner app. It's handy for testing later steps without chatting through the earlier ones.
 
 ### Navigation
 
-- **Step Indicators**: Click on completed (green checkmark) steps to review them
-- **Step Locking**: Cannot skip ahead—each step must be approved before the next unlocks
-- **Sidebar Actions**: Generate and Approve buttons in the sidebar panel
-- **Download Individual**: Click download icon next to any completed document in the Sequence panel
-- **Download All as ZIP**: Click "DOWNLOAD_ALL.ZIP" in the sidebar to download all completed documents
-- **Reset Wizard**: Click "RESET" in the header to clear all state and start fresh
+- **Step indicators:** click a completed step (green check) to review it.
+- **Download one document:** use the download icon next to it under **GENERATED DOCUMENTS** in the sidebar.
+- **Download all:** click **DOWNLOAD_ALL.ZIP** in the sidebar.
+- **Start over:** click **RESET** in the header. This clears all saved progress.
 
-### Completion Flow
+### Where progress is saved
 
-When you complete all 4 steps:
-1. A **Final Instructions Modal** appears with agent handoff guidance
-2. Download all documents as a ZIP
-3. Copy the ready-to-paste command for your AI coding agent
-4. Optionally subscribe to updates or join the Discord community
-
-### Data Persistence
-
-Your progress is automatically saved to **localStorage** (key: `wizard-storage`):
-- Chat history for each step
-- Generated documents
-- Approval status
-- Current step position
-
-This means you can:
-- Refresh the page without losing data
-- Close and reopen your browser
-- Continue exactly where you left off
-- Work offline (generation requires API connection)
+Everything is stored in the browser's localStorage under the key `wizard-storage`: chat history, generated documents, approvals and the current step. It survives refreshes and browser restarts, but not private windows, other browsers or other devices.
 
 ## Project Structure
 
 ```
-vibecode_spec_generator/
-├── app/
-│   ├── api/
-│   │   ├── chat/
-│   │   │   └── route.ts                # Streaming chat API (Edge Runtime)
-│   │   ├── generate-doc/
-│   │   │   └── route.ts                # Streaming document generation API (Edge Runtime)
-│   │   ├── subscribe/
-│   │   │   └── route.ts                # Email subscription endpoint
-│   │   ├── spikelog/
-│   │   │   └── route.ts                # Analytics event logging
-│   │   └── log-metadata/
-│   │       └── route.ts                # Spec metadata logging
-│   ├── wizard/
-│   │   ├── components/
-│   │   │   ├── ChatInterface.tsx       # Custom streaming chat UI
-│   │   │   ├── DocumentPreview.tsx     # Markdown renderer with toggle
-│   │   │   ├── FinalInstructionsModal.tsx # Completion modal with handoff instructions
-│   │   │   └── WizardStep.tsx          # Per-step orchestrator with example modal
-│   │   ├── steps/
-│   │   │   ├── step1-config.ts         # One Pager configuration
-│   │   │   ├── step2-config.ts         # Dev Spec configuration
-│   │   │   ├── step3-config.ts         # Prompt Plan configuration
-│   │   │   └── step4-config.ts         # AGENTS.md configuration
-│   │   ├── utils/
-│   │   │   ├── sampleDocs.ts           # Sample documents for testing
-│   │   │   └── stepAccess.ts           # Step access validation
-│   │   └── page.tsx                    # Main wizard page with sidebar & downloads
-│   ├── utils/
-│   │   ├── analytics.ts                # Google Analytics tracking
-│   │   └── spikelog.ts                 # Custom event logging
-│   ├── components/
-│   │   └── Footer.tsx                  # Footer component
-│   ├── globals.css                     # Global styles with Tailwind
-│   ├── layout.tsx                      # Root layout
-│   ├── page.tsx                        # Landing page
-│   ├── store.ts                        # Zustand store with localStorage
-│   └── types.ts                        # TypeScript interfaces
-├── tests/                              # Vitest test suite (200 tests)
-│   ├── unit/                           # Unit tests
-│   └── integration/                    # API integration tests
-├── .env.local                          # Environment variables (gitignored)
-├── .env.example                        # Example environment file
-├── AGENTS.md                           # Agent guidance
-├── CLAUDE.md                           # Project instructions for Claude Code
-├── README.md                           # Project documentation (this file)
-├── next.config.js                      # Next.js configuration
-├── package.json                        # Dependencies and scripts
-├── postcss.config.js                   # PostCSS configuration
-├── tailwind.config.ts                  # Tailwind CSS v3.4 configuration
-└── tsconfig.json                       # TypeScript configuration
+app/
+├── api/
+│   ├── chat/route.ts               # Streaming chat with Claude
+│   ├── generate-doc/route.ts       # Streaming document generation
+│   ├── generate-options/route.ts   # Suggested answers (structured output)
+│   ├── log-chat/route.ts           # Chat logging (Postgres, optional)
+│   ├── log-metadata/route.ts       # Spec metadata + email notification (optional)
+│   ├── subscribe/route.ts          # Email sign-up (Postgres, optional)
+│   ├── track-event/route.ts        # Cohort events (Postgres, optional)
+│   ├── spikelog/route.ts           # Spikelog metrics proxy (optional)
+│   └── validate-license/route.ts   # License key check
+├── wizard/
+│   ├── components/                 # Chat UI, option widgets, preview, modals
+│   ├── steps/step{1-4}-config.ts   # Prompts and behaviour for each step
+│   ├── utils/                      # Sample docs, step access rules
+│   └── page.tsx                    # Wizard page, sidebar, downloads
+├── schemas/questionOptions.ts      # Schema for suggested answers
+├── utils/                          # Analytics, Spikelog, metadata parsing
+├── store.ts                        # Zustand store (localStorage)
+├── types.ts                        # Shared TypeScript types
+├── layout.tsx                      # Root layout, analytics scripts
+└── page.tsx                        # Landing page
+migrations/                         # SQL migrations for the optional database
+scripts/                            # Migration runner, build-time data cleanup
+tests/                              # Vitest unit and integration tests
 ```
 
-## Architecture
+## Customizing
 
-### State Management
+### Changing what the assistant asks or writes
 
-The application uses Zustand with localStorage persistence. State structure:
+All prompts live in the step configs, `app/wizard/steps/stepN-config.ts`. Change them there rather than in the API routes.
 
-```typescript
-{
-  currentStep: number,
-  steps: {
-    onePager: {
-      chatHistory: Message[],
-      generatedDoc: string | null,
-      approved: boolean
-    },
-    devSpec: { /* same structure */ },
-    checklist: { /* same structure */ },
-    agentsMd: { /* same structure */ }
-  }
-}
-```
+- `systemPrompt` controls how the assistant behaves in the chat.
+- `generationPrompt` controls the structure of the generated document.
+- `documentInputs` lists which earlier documents the step receives, for example `["onePager", "devSpec"]`.
 
-### Step Configuration
+### Adding a field to step state
 
-Each step is configured with a `StepConfig` object:
+1. Add the field to `StepData` in `app/types.ts`.
+2. Give it a default in `initialStepData` in `app/store.ts`.
+3. Add tests in `tests/unit/store.test.ts`, and check that the value survives a page refresh.
 
-```typescript
-{
-  stepNumber: number,              // 1-4
-  stepName: string,                // "One Pager", "Dev Spec", etc.
-  userInstructions: string,        // Instructions shown in chat UI
-  systemPrompt: string,            // AI assistant's behavior for chat
-  generateButtonText: string,      // "Generate One-Pager", etc.
-  approveButtonText: string,       // Usually "Approve Draft & Save"
-  documentInputs: string[],        // Previous step keys for context
-  initialGreeting?: string,        // Optional first message from AI
-  generationPrompt?: string,       // Optional custom generation instructions
-  inputPlaceholder?: string        // Optional placeholder text for chat input
-}
-```
+Don't rename the `wizard-storage` key. Doing so discards every user's saved progress.
 
-### Document Context Flow
+## Scripts
 
-Steps automatically receive previous documents as context:
-
-- **Step 1**: No context (fresh start)
-- **Step 2**: Receives `onePager` document
-- **Step 3**: Receives `onePager` and `devSpec` documents
-- **Step 4**: Receives `onePager`, `devSpec`, and `checklist` documents
-
-This is configured via the `documentInputs` array in each step config.
-
-## Customizing Steps
-
-### Modifying AI Behavior
-
-Edit the step configuration file (e.g., `app/wizard/steps/step2-config.ts`):
-
-```typescript
-export const step2Config: StepConfig = {
-  stepNumber: 2,
-  stepName: "Dev Spec",
-  userInstructions: "Let's create a detailed technical specification...",
-  systemPrompt: "You are a technical architect helping to create a dev spec. Ask about: architecture, data models, API design, tech stack choices, security considerations, and testing strategy.",
-  generateButtonText: "Generate Dev Spec",
-  approveButtonText: "Approve Draft & Save",
-  documentInputs: ["onePager"],
-  initialGreeting: "I'll help you create a comprehensive development specification based on your one-pager. Let's start with the technical architecture - what's your preferred tech stack?",
-};
-```
-
-### Changing Document Output Format
-
-Modify the `generationPrompt` field in the step config to customize the output structure:
-
-```typescript
-generationPrompt: "Generate a markdown document with these sections: Overview, Architecture, API Design, Data Models, Security, Testing. Use tables for data models and code blocks for API examples."
-```
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
-
-## Key Features Explained
-
-### Sample Document Loading (Development Mode)
-
-The "LOAD_SAMPLES" button (`app/wizard/utils/sampleDocs.ts`) provides instant test data:
-- Populates all 4 steps with a complete Photo Captioner app specification
-- Marks all steps as approved
-- Useful for testing, demonstrations, and understanding output format
-- Only visible when `NODE_ENV=development`
-
-### ZIP Download
-
-The "Download All as ZIP" feature:
-- Creates `GENERATED_DOCS.zip` containing all completed documents
-- Uses JSZip library for in-browser ZIP creation
-- Only includes documents that have been generated
-- Maintains ALL_CAPS_UNDERSCORES.md naming convention
-
-### File Naming Convention
-
-All downloaded files use:
-- Uppercase letters: `ONE_PAGER.md`, `DEV_SPEC.md`, `PROMPT_PLAN.md`, `AGENTS.md`
-- Underscores replace spaces
-- `.md` extension for markdown
-
-### Custom Streaming Implementation
-
-ChatInterface doesn't use `@ai-sdk/react`'s `useChat` hook:
-- Manual fetch to `/api/chat` endpoint for chat messages
-- Manual fetch to `/api/generate-doc` endpoint for document generation
-- Both endpoints stream text chunks for progressive display
-- Reads streamed text chunks and appends them incrementally
-- This approach was necessary due to SDK version compatibility
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server at http://localhost:3000 |
+| `npm run build` | Data cleanup script, then production build (also type-checks) |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm test` | Run the test suite once |
+| `npm run test:watch` | Tests in watch mode |
+| `npm run test:coverage` | Tests with a coverage report |
 
 ## Troubleshooting
 
-### API Key Issues
+### Chat or generation fails, or returns nothing
 
-If you get authentication errors:
-1. Verify `.env.local` file exists in project root
-2. Check that `OPENAI_API_KEY=sk-...` is set correctly
-3. Restart the dev server after changing environment variables (`npm run dev`)
-4. Verify API key is valid at https://platform.openai.com/api-keys
+1. Check that `ANTHROPIC_API_KEY` is set in `.env.local` (locally) or in the host's environment variables (deployed), then restart or redeploy.
+2. Check that the key is active and its workspace has credit and hasn't hit its spending limit in the [Claude Console](https://console.anthropic.com/).
+3. Look at the server log (the terminal running `npm run dev`, or the Vercel function logs). Errors from the API appear there as `AI_APICallError` with the reason.
+4. If you set `ANTHROPIC_MODEL`, make sure it's an exact current model ID, such as `claude-opus-5-5`.
 
-### Build Errors
+### Suggested answers never appear
 
-Run the build command to see detailed TypeScript errors:
-```bash
-npm run build
-```
+If `/api/generate-options` returns an empty body and the server log shows `tool_choice: type "tool" and "any" are not supported for this model`, `@ai-sdk/anthropic` is too old for the model. Run `npm install` to get the version in `package-lock.json` (2.0.109 or newer).
 
-Common issues:
-- Missing dependencies: `npm install`
-- Type errors: Check `app/types.ts` for correct interfaces
-- Edge Runtime compatibility: Ensure no Node.js-only APIs in `app/api/` routes
+### Build errors
 
-### Streaming Not Working
+Run `npm run build` locally to see the full TypeScript output. The usual causes:
+- Dependencies not installed: run `npm install`.
+- Node.js older than 20.9.
+- Node-only APIs used in an `app/api` route. Those routes run on the Edge Runtime.
 
-If chat messages don't stream in real-time:
-1. Check browser console for errors (F12)
-2. Verify the API route returns a stream: `curl http://localhost:3000/api/chat`
-3. Check API key has sufficient credits
-4. Ensure no ad blockers or extensions blocking streams
-5. Try clearing localStorage: `localStorage.removeItem('wizard-storage')`
+### Progress isn't saved
 
-### State Persistence Issues
-
-If state isn't persisting across refreshes:
-1. Check browser console for localStorage errors
-2. Verify you're not in incognito/private mode
-3. Clear and reset: Click "Reset Wizard" button
-4. Manually clear: `localStorage.removeItem('wizard-storage')` in console
-
-### Download Issues
-
-If downloads aren't working:
-1. Check browser allows downloads from localhost
-2. Verify document was generated (not null)
-3. Check browser console for errors
-4. For ZIP downloads, ensure JSZip loaded: check Network tab
-
-## Development Guidelines
-
-### Adding Features
-
-See `AGENTS.md` for detailed agent guidance. Key principles:
-
-1. **Respect the Three-Phase Pattern**: Chat → Generation → Approval
-2. **Update TypeScript Types**: Modify `app/types.ts` for any state changes
-3. **Test State Persistence**: Verify changes work after page refresh
-4. **Maintain Edge Runtime**: No Node.js APIs in `/api` routes
-5. **Use Step Configs**: Don't hardcode prompts or instructions
-
-### Testing Your Changes
-
-1. Start fresh: Click "Reset Wizard"
-2. Test manual flow through all 4 steps
-3. Test "Load Sample Docs" functionality
-4. Test individual and ZIP downloads
-5. Refresh browser and verify state persists
-6. Test with missing API key (error handling)
-
-### File Modifications
-
-- **Step behavior**: Edit `app/wizard/steps/stepN-config.ts`
-- **State structure**: Edit `app/types.ts` + `app/store.ts`
-- **UI components**: Edit `app/wizard/components/*.tsx`
-- **API endpoints**: Edit `app/api/*/route.ts` (Edge Runtime only)
-- **Styling**: Edit `app/globals.css` or use Tailwind classes
-
-### Common Customizations
-
-**Change AI Model**:
-```bash
-# In .env.local
-
-# Default model (if unset) is gpt-4o
-OPENAI_MODEL=gpt-4o           # e.g., gpt-4o, gpt-4o-mini, gpt-4.1, gpt-3.5-turbo
-```
-
-**Add Step Field**:
-```typescript
-// 1. Update app/types.ts
-export interface StepData {
-  chatHistory: Message[];
-  generatedDoc: string | null;
-  approved: boolean;
-  yourNewField: string;  // Add here
-}
-
-// 2. Update app/store.ts
-const initialStepData: StepData = {
-  chatHistory: [],
-  generatedDoc: null,
-  approved: false,
-  yourNewField: "",  // Add here
-};
-```
-
-**Customize Document Naming**:
-```typescript
-// In app/wizard/page.tsx (line 59 and 90)
-a.download = `${stepName.toUpperCase().replace(/\s+/g, '_')}.md`;
-// Change toUpperCase() or replace() pattern as needed
-```
+1. Private or incognito windows don't keep localStorage after they close.
+2. Check the browser console for storage errors.
+3. To reset, click **RESET**, or run `localStorage.removeItem('wizard-storage')` in the console.
 
 ## Related Documentation
 
-- **AGENTS.md**: Detailed guidance for automated agents and architecture details
-- **CLAUDE.md**: Instructions specifically for Claude Code IDE integration
-- **.env.example**: Environment variable template
-
-## Tech Details
-
-- **Next.js Version**: 15.1.0
-- **React Version**: 19.0.0
-- **TypeScript Version**: 5
-- **Tailwind Version**: 3.4.1
-- **AI SDK Version**: Latest (`ai` package)
-- **Test Framework**: Vitest 4.0.10 with @testing-library/react (200 tests)
-- **Default OpenAI Model**: `gpt-4o` (configurable via `OPENAI_MODEL`)
-- **Runtime**: Edge Runtime for API routes
-- **State Management**: Zustand with localStorage persistence
+- **AGENTS.md**: architecture and testing guidance for coding agents
+- **CLAUDE.md**: project instructions for Claude Code
+- **ANALYTICS.md**: the analytics events the app tracks
+- **tests/README.md**: test suite layout and mocking patterns
+- **.env.example**: environment variable template
 
 ## License
 
 MIT
-
----
-
-Built with ❤️ using Next.js, OpenAI, and TypeScript
