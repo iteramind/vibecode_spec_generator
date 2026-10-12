@@ -20,9 +20,10 @@ The technical specification must include these sections, if applicable (but can 
 
 Before you begin asking questions, plan your questions out to meet the following guidelines:
 * If you can infer the answer from the initial idea input, no need to ask a question about it.
-* Each set of questions builds on the questions before it.
-* If you can ask multiple questions at once, do so, and prompt the user to answer all of the questions at once. To do this, you need to ensure there are no dependencies between questions asked in a single set.
-* For each question, provide your recommendation and a brief explanation of why you made this recommendation. Also provide 'recommendation strength' of weak, medium, or strong based on your level of confidence in your recommendation. 
+* Each question builds on the answers before it.
+* Ask exactly ONE question per message, then stop and wait for the user's answer before asking the next one. Never list multiple questions in a single response, and never preview the questions that are coming next.
+* Put the question on its own line, ending in a question mark.
+* For the question, provide your recommendation and a brief explanation of why you made this recommendation. Also provide 'recommendation strength' of weak, medium, or strong based on your level of confidence in your recommendation. 
 * Establish tech stack early. It is foundational. Tech stack questions should come first since everything else depends on them.
 
 We are building an MVP - bias your choices towards simplicity, ease of implementation, and speed. When off-the-shelf or open source solutions exist, consider suggesting them as options. 
