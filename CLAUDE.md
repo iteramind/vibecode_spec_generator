@@ -38,7 +38,7 @@ Copy `.env.example` to `.env.local` and configure:
 ```bash
 # Required: Anthropic API Key
 ANTHROPIC_API_KEY=your_api_key_here
-ANTHROPIC_MODEL=claude-opus-4-8
+ANTHROPIC_MODEL=claude-opus-5-5
 
 # Optional: Analytics
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
@@ -49,7 +49,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 - Document Generation: `app/api/generate-doc/route.ts`
 - Options Generation: `app/api/generate-options/route.ts`
 
-All routes import `@ai-sdk/anthropic` and default to `claude-opus-4-8`.
+All routes import `@ai-sdk/anthropic` and default to `claude-opus-5-5`.
 
 ## Architecture
 

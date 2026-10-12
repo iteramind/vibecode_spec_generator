@@ -72,7 +72,7 @@ describe("Generate Options API Route", () => {
       else delete process.env.ANTHROPIC_MODEL;
     });
 
-    it("should default to claude-opus-4-8 when no environment variables are set", async () => {
+    it("should default to claude-opus-5-5 when no environment variables are set", async () => {
       // Arrange
       const { anthropic } = await import("@ai-sdk/anthropic");
       const originalModel = process.env.ANTHROPIC_MODEL;
@@ -87,7 +87,7 @@ describe("Generate Options API Route", () => {
       await POST(req);
 
       // Assert
-      expect(anthropic).toHaveBeenCalledWith("claude-opus-4-8");
+      expect(anthropic).toHaveBeenCalledWith("claude-opus-5-5");
 
       // Cleanup
       if (originalModel) process.env.ANTHROPIC_MODEL = originalModel;

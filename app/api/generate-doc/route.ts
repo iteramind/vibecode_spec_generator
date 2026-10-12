@@ -70,7 +70,7 @@ Please generate the ${stepName} document now in markdown format:`;
     console.log(generationPrompt);
     console.log("-".repeat(80) + "\n");
 
-    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
+    const modelName = process.env.ANTHROPIC_MODEL || "claude-opus-5-5";
     console.log(`🔧 Using model: ${modelName}\n`);
 
     const result = streamText({

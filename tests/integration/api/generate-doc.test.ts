@@ -251,7 +251,7 @@ describe("Generate Doc API Route", () => {
       }
     });
 
-    it("should default to claude-opus-4-8 when no environment variable set", async () => {
+    it("should default to claude-opus-5-5 when no environment variable set", async () => {
       const { anthropic } = await import("@ai-sdk/anthropic");
       const originalEnv = process.env.ANTHROPIC_MODEL;
 
@@ -267,7 +267,7 @@ describe("Generate Doc API Route", () => {
 
       await POST(req);
 
-      expect(anthropic).toHaveBeenCalledWith("claude-opus-4-8");
+      expect(anthropic).toHaveBeenCalledWith("claude-opus-5-5");
 
       if (originalEnv) {
         process.env.ANTHROPIC_MODEL = originalEnv;
