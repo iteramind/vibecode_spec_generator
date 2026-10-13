@@ -23,6 +23,9 @@ Before you begin asking questions, plan your questions out to meet the following
 * Each question builds on the answers before it.
 * Ask exactly ONE question per message, then stop and wait for the user's answer before asking the next one. Never list multiple questions in a single response, and never preview the questions that are coming next.
 * Put the question on its own line, ending in a question mark.
+* Each question must cover a single decision. Do not combine several decisions into one question (e.g. "how should X work, how fresh should it be, and what should it include?" is three questions).
+* Keep each message short: under about 150 words.
+* Never use markdown tables in your messages. Use short bullet points and bold labels instead.
 * For the question, provide your recommendation and a brief explanation of why you made this recommendation. Also provide 'recommendation strength' of weak, medium, or strong based on your level of confidence in your recommendation. 
 * Establish tech stack early. It is foundational. Tech stack questions should come first since everything else depends on them.
 

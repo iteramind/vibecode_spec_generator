@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { analytics, getOrCreateClientId } from "@/app/utils/analytics";
 import { spikelog } from "@/app/utils/spikelog";
 import { useHasHydrated } from "@/app/store";
+import { ChatMarkdown } from "./ChatMarkdown";
 
 interface ChatInterfaceProps {
   systemPrompt: string;
@@ -385,12 +386,16 @@ export default function ChatInterface({
               {message.role === "user" ? "You" : "Vibe Scaffold Assistant"}
             </div>
 
-            <div className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+            <div className={`px-4 py-3 text-sm leading-relaxed ${
               message.role === "user"
-                ? "bg-accent-glow border border-accent/30 text-[#e4e4e7]"
+                ? "whitespace-pre-wrap bg-accent-glow border border-accent/30 text-[#e4e4e7]"
                 : "bg-zinc-800 border-l-2 border-zinc-700 text-[#a1a1aa]"
             }`}>
-              {message.content}
+              {message.role === "assistant" ? (
+                <ChatMarkdown content={message.content} />
+              ) : (
+                message.content
+              )}
               {message.role === "assistant" && isAssistantPending === message.id && (
                 <span className="ml-2 inline-flex items-center gap-2 text-accent">
                   <svg className="w-4 h-4 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

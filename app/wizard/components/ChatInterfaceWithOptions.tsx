@@ -8,6 +8,7 @@ import { analytics, getOrCreateClientId } from "@/app/utils/analytics";
 import { spikelog } from "@/app/utils/spikelog";
 import { useHasHydrated } from "@/app/store";
 import { OptionsModal, type OptionsModalItem } from "./OptionsModal";
+import { ChatMarkdown } from "./ChatMarkdown";
 import { extractQuestionLines } from "@/app/wizard/utils/questionInstances";
 import { questionOptionsSchema } from "@/app/schemas/questionOptions";
 import { summarizeConversation } from "@/app/hooks/useQuestionOptions";
@@ -433,13 +434,17 @@ export default function ChatInterfaceWithOptions({
             </div>
 
             <div
-              className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap w-full ${
+              className={`px-4 py-3 text-sm leading-relaxed w-full ${
                 message.role === "user"
-                  ? "bg-accent-glow border border-accent/30 text-[#e4e4e7]"
+                  ? "whitespace-pre-wrap bg-accent-glow border border-accent/30 text-[#e4e4e7]"
                   : "bg-zinc-800 border-l-2 border-zinc-700 text-[#a1a1aa]"
               }`}
             >
-              {message.content}
+              {message.role === "assistant" ? (
+                <ChatMarkdown content={message.content} />
+              ) : (
+                message.content
+              )}
               {message.role === "assistant" && isAssistantPending === message.id && (
                 <span className="ml-2 inline-flex items-center gap-2 text-accent">
                   <svg
